@@ -18,13 +18,13 @@ jobs:
     - name: Set up Python 3.12
       uses: actions/setup-python@v4
       with:
-        python-version: '3.12'  
+        python-version: '3.12'  # Updated to match your local Python version
 
     - name: Cache pip
       uses: actions/cache@v3
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}  # Updated to include both requirements.txt and requirements-dev.txt
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
 
@@ -35,6 +35,7 @@ jobs:
         pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
+        pip install -e .  # Install the package in editable mode
 
     - name: Run Unit Tests
       run: |
