@@ -1,0 +1,50 @@
+
+---
+
+# CHANGELOG.md
+
+```markdown
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- **Key Management Module:**
+  - `key_generation.py`: Handles SSH key pair creation with support for various key types and sizes, including optional passphrase protection.
+  - `key_validation.py`: Provides functionalities to validate SSH keys for type, size, and passphrase encryption.
+  - `key_storage.py`: Manages secure storage and retrieval of SSH keys, ensuring encryption of private keys and appropriate file permissions.
+- **Unit Tests:**
+  - Added unit tests for `key_generation.py`, `key_validation.py`, and `key_storage.py` within `tests/unit/key_management/`.
+  - Created example test structures and mock implementations for comprehensive testing.
+- **Documentation:**
+  - `KEY_MANAGEMENT_USAGE.md`: Detailed usage guide for the Key Management module, including module summaries, function descriptions, best practices, unit testing guidelines, and security considerations.
+- **Changelog:**
+  - `CHANGELOG.md`: Document detailing all changes and updates made to the project.
+
+### Changed
+- Project structure updated to include `key_management/` module with corresponding Python files and tests.
+- Test organization refined to place unit tests within `tests/unit/key_management/` directory.
+
+### Deprecated
+- None.
+
+### Removed
+- None.
+
+### Fixed
+- None.
+
+### Security
+- Implemented robust encryption mechanisms using `Fernet` for securing private SSH keys.
+- Enforced restrictive file permissions (`600` for private keys, `644` for public keys) to enhance security.
+
+## [0.1.0] - YYYY-MM-DD
+
+### Initial Release
+- Initial setup of the Key Management module with key generation, validation, and storage functionalities.
+- Comprehensive documentation and unit tests added.
