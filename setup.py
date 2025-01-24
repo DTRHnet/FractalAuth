@@ -1,42 +1,33 @@
-from setuptools import setup, find_packages
-import os
+# setup.py
 
-# Read the contents of README.md for the long description
-this_directory = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+from setuptools import setup, find_packages
 
 setup(
     name='FractalAuth',
     version='0.1.0',
-    packages=find_packages(),
+    packages=find_packages(where='src'),
+    package_dir={'': 'src'},
     install_requires=[
-        # Add your project dependencies here
-        # Example:
-        # 'cryptography',
-        # 'numpy',
-        # 'Pillow',
+        'cryptography==3.4.7',
+        'paramiko==2.7.2',  # Include if used
     ],
-    author='KBS',
-    author_email='admin@dtrh.net',
-    description='A secure Fractal Generator for SSH Key Authentication using Mandelbrot Set',
-    long_description=long_description,
-    long_description_content_type='text/markdown',
-    url='https://github.com/your-username/fractalauth',  # Replace with your repository URL
-    license='Apache 2.0',
-    classifiers=[
-        'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.11',
-        'Operating System :: OS Independent',
-    ],
-    python_requires='>=3.10',
-    entry_points={
-        'console_scripts': [
-            'fractalauth=src.main:main',  # Adjust if your main function is different
+    extras_require={
+        'dev': [
+            'pytest==6.2.4',
+            'pytest-cov==2.12.1',
+            'flake8==3.9.2',
+            'black==21.7b0',
+            'mypy>=1.5.0',  # Updated to eliminate typed-ast dependency
         ],
     },
-    include_package_data=True,
-    zip_safe=False,
+    author='Your Name',
+    author_email='your.email@example.com',
+    description='FractalAuth Key Management Module',
+    url='https://github.com/yourusername/FractalAuth',
+    classifiers=[
+        'Programming Language :: Python :: 3',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+    ],
+    python_requires='>=3.6',
 )

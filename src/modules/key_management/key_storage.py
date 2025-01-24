@@ -10,12 +10,14 @@ and that public keys are accessible as needed.
 
 import logging
 import os
+import base64
 from typing import Optional, Dict
 
 from cryptography.fernet import Fernet, InvalidToken
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
+from .exceptions import UnsupportedAlgorithm
 
 
 class KeyStorage:
@@ -47,14 +49,21 @@ class KeyStorage:
         if not self.logger.handlers:
             self.logger.addHandler(ch)
 
+
+
         # Set the storage directory for keys
         self.storage_path = storage_path
-        try:
+        # Ensure that the storage path exists
+        if not os.path.exists(self.storage_path):
             os.makedirs(self.storage_path, exist_ok=True)
-            self.logger.info(f"Key storage directory set at: {self.storage_path}")
-        except Exception as e:
-            self.logger.error(f"Failed to create storage directory '{self.storage_path}': {str(e)}")
-            raise
+            self.logger.debug(f"Created storage directory at: {self.storage_path}")
+
+#        try:
+#            os.makedirs(self.storage_path, exist_ok=True)
+#            self.logger.info(f"Key storage directory set at: {self.storage_path}")
+#        except Exception as e:
+#            self.logger.error(f"Failed to create storage directory '{self.storage_path}': {str(e)}")
+#            raise
 
         # Initialize encryption
         if encryption_key:
@@ -260,21 +269,6 @@ class KeyStorage:
             raise Exception(f"Failed to store public key: {str(e)}")
 
     def retrieve_private_key(self, filename: str = 'id_rsa', passphrase: Optional[str] = None) -> str:
-        """
-        Retrieve and decrypt the stored private SSH key.
-
-        Args:
-            filename (str): The filename of the stored private key.
-            passphrase (Optional[str]): The passphrase used to decrypt the private key, if any.
-
-        Returns:
-            str: The decrypted private SSH key.
-
-        Raises:
-            FileNotFoundError: If the specified private key file does not exist.
-            ValueError: If decryption fails due to incorrect passphrase or corrupted data.
-            Exception: If retrieval fails due to other errors.
-        """
         self.logger.debug(f"Retrieving private key from filename: {filename}, passphrase_provided: {'Yes' if passphrase else 'No'}")
         try:
             # Define the full path for the private key file
@@ -300,12 +294,13 @@ class KeyStorage:
         except FileNotFoundError:
             self.logger.error(f"Private key file '{filename}' not found in storage.")
             raise FileNotFoundError(f"Private key file '{filename}' not found in storage.")
-        except ValueError as ve:
-            self.logger.error(f"Decryption failed: {str(ve)}")
-            raise ValueError(f"Decryption failed: {str(ve)}")
+        except UnicodeDecodeError as ude:
+            self.logger.error(f"Decryption failed: {str(ude)}")
+            raise ValueError(f"Decryption failed: {str(ude)}") from ude
         except Exception as e:
-            self.logger.error(f"Failed to retrieve private key: {str(e)}")
-            raise Exception(f"Failed to retrieve private key: {str(e)}")
+            self.logger.error(f"Decryption failed: {str(e)}")
+            raise ValueError(f"Decryption failed: {str(e)}") from e
+
 
     def retrieve_public_key(self, filename: str = 'id_rsa.pub') -> str:
         """

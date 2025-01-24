@@ -10,12 +10,10 @@ It also supports generating keys with optional passphrase protection to enhance 
 
 import logging
 from typing import Tuple, Optional
-
+from .exceptions import UnsupportedAlgorithm  # Ensure this is your custom exception
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa, dsa, ec, ed25519
 from cryptography.hazmat.backends import default_backend
-from cryptography.exceptions import UnsupportedAlgorithm
-
 
 class KeyGenerator:
     def __init__(self):
@@ -37,7 +35,7 @@ class KeyGenerator:
         # Add formatter to ch
         ch.setFormatter(formatter)
 
-        # Add ch to logger
+        # Add ch to logger if not already added
         if not self.logger.handlers:
             self.logger.addHandler(ch)
 
@@ -75,14 +73,16 @@ class KeyGenerator:
             List[int]: A list of valid key sizes for the specified key type.
 
         Raises:
-            ValueError: If the provided key_type is not supported.
+            UnsupportedAlgorithm: If the provided key_type is not supported.
         """
         self.logger.debug(f"Listing valid SSH key sizes for key type: {key_type}")
 
         # Validate the key_type
         if key_type not in self.valid_key_types:
             self.logger.error(f"Invalid key type requested: {key_type}")
-            raise ValueError(f"Unsupported key type: {key_type}. Supported types are: {', '.join(self.valid_key_types.keys())}")
+            raise UnsupportedAlgorithm(
+                f"Unsupported key type: {key_type}. Supported types are: {', '.join(self.valid_key_types.keys())}"
+            )
 
         # Retrieve the list of valid key sizes for the given key_type
         key_sizes = self.valid_key_types[key_type]
@@ -102,20 +102,25 @@ class KeyGenerator:
             Tuple[str, str]: A tuple containing the private key and public key as strings.
 
         Raises:
-            ValueError: If the key_type or key_size is invalid.
-            UnsupportedAlgorithm: If the key_type is unsupported by the cryptography library.
+            UnsupportedAlgorithm: If the key_type or key_size is invalid or unsupported.
             Exception: If key generation fails due to underlying library errors.
         """
-        self.logger.debug(f"Generating key pair with type: {key_type}, size: {key_size}, passphrase: {'Yes' if passphrase else 'No'}")
+        self.logger.debug(
+            f"Generating key pair with type: {key_type}, size: {key_size}, passphrase: {'Yes' if passphrase else 'No'}"
+        )
 
         # Validate key_type and key_size using existing methods
         if not self.validate_key_type(key_type):
             self.logger.error(f"Invalid key type provided: {key_type}")
-            raise ValueError(f"Invalid key type: {key_type}. Supported types are: {', '.join(self.valid_key_types.keys())}")
+            raise UnsupportedAlgorithm(
+                f"Invalid key type: {key_type}. Supported types are: {', '.join(self.valid_key_types.keys())}"
+            )
 
         if not self.validate_key_size(key_type, key_size):
             self.logger.error(f"Invalid key size provided: {key_size} for key type: {key_type}")
-            raise ValueError(f"Invalid key size: {key_size} for key type: {key_type}. Supported sizes are: {self.valid_key_types[key_type]}")
+            raise UnsupportedAlgorithm(
+                f"Invalid key size: {key_size} for key type: {key_type}. Supported sizes are: {self.valid_key_types[key_type]}"
+            )
 
         try:
             # Generate the SSH key pair based on key_type
@@ -162,12 +167,18 @@ class KeyGenerator:
             )
             self.logger.debug("Private key serialized successfully.")
 
-            # Serialize the public key
-            pem_public = private_key.public_key().public_bytes(
-                encoding=serialization.Encoding.OpenSSH,
-                format=serialization.PublicFormat.OpenSSH
-            )
-            self.logger.debug("Public key serialized successfully.")
+            if key_type in ['RSA', 'DSA', 'ECDSA']:
+                pem_public = private_key.public_key().public_bytes(
+                    encoding=serialization.Encoding.OpenSSH,
+                    format=serialization.PublicFormat.OpenSSH
+                )
+            elif key_type == 'ED25519':
+                pem_public = private_key.public_key().public_bytes(
+                    encoding=serialization.Encoding.OpenSSH,
+                    format=serialization.PublicFormat.OpenSSH
+                )
+  
+                self.logger.debug("Public key serialized successfully.")
 
             self.logger.info(f"SSH key pair generation successful for type: {key_type}, size: {key_size}")
             return pem_private.decode('utf-8'), pem_public.decode('utf-8')
@@ -207,9 +218,11 @@ class KeyGenerator:
         try:
             valid_sizes = self.list_valid_key_sizes(key_type)
             is_valid = key_size in valid_sizes
-            self.logger.debug(f"Validating key size: {key_size} for key type: {key_type} - {'Valid' if is_valid else 'Invalid'}")
+            self.logger.debug(
+                f"Validating key size: {key_size} for key type: {key_type} - {'Valid' if is_valid else 'Invalid'}"
+            )
             return is_valid
-        except ValueError:
+        except UnsupportedAlgorithm:
             self.logger.error(f"Attempted to validate key size for unsupported key type: {key_type}")
             return False
 
@@ -224,7 +237,7 @@ class KeyGenerator:
             EllipticCurve: The corresponding elliptic curve.
 
         Raises:
-            ValueError: If the key_size does not correspond to a supported curve.
+            UnsupportedAlgorithm: If the key_size does not correspond to a supported curve.
         """
         self.logger.debug(f"Mapping key size {key_size} to ECDSA curve.")
         # Map key_size to the appropriate elliptic curve
@@ -239,4 +252,6 @@ class KeyGenerator:
             return ec.SECP521R1()
         else:
             self.logger.error(f"Unsupported ECDSA key size: {key_size}")
-            raise ValueError(f"Unsupported ECDSA key size: {key_size}. Supported sizes are: {', '.join(map(str, self.valid_key_types['ECDSA'])))}")
+            raise UnsupportedAlgorithm(
+                f"Unsupported ECDSA key size: {key_size}. Supported sizes are: {', '.join(map(str, self.valid_key_types['ECDSA']))}"
+            )

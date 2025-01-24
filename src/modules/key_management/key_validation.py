@@ -9,6 +9,7 @@ Additionally, it checks for passphrase protection where necessary to enforce sec
 """
 
 import logging
+import base64
 from typing import Optional
 
 from cryptography.hazmat.primitives import serialization
@@ -17,7 +18,14 @@ from cryptography.hazmat.primitives.serialization import (
     load_pem_private_key,
     load_ssh_public_key
 )
-from cryptography.exceptions import UnsupportedAlgorithm, InvalidKey
+from cryptography.hazmat.primitives.asymmetric.rsa import (
+    RSAPrivateKey, 
+    RSAPublicKey
+)
+from cryptography.exceptions import (
+    UnsupportedAlgorithm, 
+    InvalidKey
+)
 
 from .key_generation import KeyGenerator
 
@@ -116,7 +124,7 @@ class KeyValidator:
             self.logger.debug("Private key loaded successfully.")
 
             # Determine key type and size
-            if isinstance(private_key_obj, rsa.RSAPrivateKey):
+            if isinstance(private_key_obj, RSAPrivateKey):
                 key_type = 'RSA'
                 key_size = private_key_obj.key_size
             elif isinstance(private_key_obj, dsa.DSAPrivateKey):
@@ -206,7 +214,7 @@ class KeyValidator:
             self.logger.debug("Public key loaded successfully.")
 
             # Determine key type and size
-            if isinstance(public_key_obj, rsa.RSAPublicKey):
+            if isinstance(public_key_obj, RSAPublicKey):
                 key_type = 'RSA'
                 key_size = public_key_obj.key_size
             elif isinstance(public_key_obj, dsa.DSAPublicKey):

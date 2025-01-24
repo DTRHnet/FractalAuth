@@ -1,9 +1,9 @@
 # tests/integration/key_management/test_key_management_integration.py
 
 import unittest
-from key_management.key_generation import KeyGenerator
-from key_management.key_validation import KeyValidator
-from key_management.key_storage import KeyStorage
+from modules.key_management.key_generation import KeyGenerator
+from modules.key_management.key_validation import KeyValidator
+from modules.key_management.key_storage import KeyStorage
 from cryptography.fernet import Fernet
 import os
 

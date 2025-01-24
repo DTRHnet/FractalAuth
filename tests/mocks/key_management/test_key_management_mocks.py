@@ -2,7 +2,8 @@
 
 import unittest
 from unittest.mock import MagicMock
-from key_management.key_generation import KeyGenerator
+from modules.key_management.key_generation import KeyGenerator
+
 
 class TestKeyManagementMocks(unittest.TestCase):
     def setUp(self):

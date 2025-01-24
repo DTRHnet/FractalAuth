@@ -2,8 +2,8 @@
 
 import unittest
 from unittest.mock import patch, MagicMock
-from key_management.key_validation import KeyValidator
-from key_management.key_generation import KeyGenerator
+from modules.key_management.key_validation import KeyValidator
+from modules.key_management.key_generation import KeyGenerator
 from cryptography.hazmat.primitives.asymmetric import rsa, dsa, ec, ed25519
 from cryptography.hazmat.primitives import serialization
 from cryptography.exceptions import UnsupportedAlgorithm, InvalidKey
@@ -25,7 +25,7 @@ class TestKeyValidator(unittest.TestCase):
     def test_validate_key_size_invalid(self):
         self.assertFalse(self.key_validator.validate_key_size('RSA', 1024))
 
-    @patch('key_management.key_validation.load_pem_private_key')
+    @patch('modules.key_management.key_validation.load_pem_private_key')
     def test_validate_private_key_valid_encrypted(self, mock_load_pem_private_key):
         mock_private_key_obj = MagicMock(spec=rsa.RSAPrivateKey)
         mock_private_key_obj.key_size = 2048
@@ -41,7 +41,7 @@ class TestKeyValidator(unittest.TestCase):
 
                 self.assertTrue(result)
 
-    @patch('key_management.key_validation.load_pem_private_key')
+    @patch('modules.key_management.key_validation.load_pem_private_key')
     def test_validate_private_key_valid_unencrypted(self, mock_load_pem_private_key):
         mock_private_key_obj = MagicMock(spec=rsa.RSAPrivateKey)
         mock_private_key_obj.key_size = 2048
@@ -54,7 +54,7 @@ class TestKeyValidator(unittest.TestCase):
 
                 self.assertTrue(result)
 
-    @patch('key_management.key_validation.load_pem_private_key')
+    @patch('modules.key_management.key_validation.load_pem_private_key')
     def test_validate_private_key_invalid_decryption(self, mock_load_pem_private_key):
         mock_load_pem_private_key.side_effect = ValueError("Incorrect passphrase.")
 
@@ -62,7 +62,7 @@ class TestKeyValidator(unittest.TestCase):
 
         self.assertFalse(result)
 
-    @patch('key_management.key_validation.load_pem_private_key')
+    @patch('modules.key_management.key_validation.load_pem_private_key')
     def test_validate_private_key_unsupported_type(self, mock_load_pem_private_key):
         mock_private_key_obj = MagicMock()
         mock_load_pem_private_key.return_value = mock_private_key_obj
@@ -73,7 +73,7 @@ class TestKeyValidator(unittest.TestCase):
 
         self.assertFalse(result)
 
-    @patch('key_management.key_validation.load_ssh_public_key')
+    @patch('modules.key_management.key_validation.load_ssh_public_key')
     def test_validate_public_key_valid(self, mock_load_ssh_public_key):
         mock_public_key_obj = MagicMock(spec=rsa.RSAPublicKey)
         mock_public_key_obj.key_size = 2048
@@ -84,7 +84,7 @@ class TestKeyValidator(unittest.TestCase):
                 result = self.key_validator.validate_public_key('valid_public_key_str')
                 self.assertTrue(result)
 
-    @patch('key_management.key_validation.load_ssh_public_key')
+    @patch('modules.key_management.key_validation.load_ssh_public_key')
     def test_validate_public_key_invalid_type(self, mock_load_ssh_public_key):
         mock_public_key_obj = MagicMock()
         mock_public_key_obj.__class__ = MagicMock()  # Unsupported key type
@@ -93,7 +93,7 @@ class TestKeyValidator(unittest.TestCase):
         result = self.key_validator.validate_public_key('invalid_public_key_str')
         self.assertFalse(result)
 
-    @patch('key_management.key_validation.load_ssh_public_key')
+    @patch('modules.key_management.key_validation.load_ssh_public_key')
     def test_validate_public_key_invalid_key_size(self, mock_load_ssh_public_key):
         mock_public_key_obj = MagicMock(spec=rsa.RSAPublicKey)
         mock_public_key_obj.key_size = 1024  # Assuming 1024 is invalid for RSA in this context
@@ -104,7 +104,7 @@ class TestKeyValidator(unittest.TestCase):
                 result = self.key_validator.validate_public_key('invalid_size_public_key_str')
                 self.assertFalse(result)
 
-    @patch('key_management.key_validation.load_pem_private_key')
+    @patch('modules.key_management.key_validation.load_pem_private_key')
     def test_validate_private_key_missing_passphrase(self, mock_load_pem_private_key):
         mock_private_key_obj = MagicMock(spec=rsa.RSAPrivateKey)
         mock_private_key_obj.key_size = 2048
