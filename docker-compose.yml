@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  FractalAuth:
+    build: .
+    container_name: FractalAuth
+    restart: unless-stopped
+    ports:
+      - "8000:8000" # Adjust based on your application
+    volumes:
+      - ./data/fractals/generated:/app/data/fractals/generated
+      - ./data/logs:/app/data/logs
+      - ./data/keys:/app/data/keys
+    environment:
+      - ENV_VAR_NAME=value # Replace with actual environment variables

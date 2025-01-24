@@ -1,0 +1,99 @@
+fractal-generator/
+├── README.md
+├── LICENSE
+├── .gitignore
+├── requirements.txt
+├── setup.py
+├── docs/
+│   ├── index.md
+│   ├── installation.md
+│   ├── usage.md
+│   ├── architecture.md
+│   └── api_reference.md
+├── src/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── config/
+│   │   ├── __init__.py
+│   │   └── config.yaml
+│   ├── modules/
+│   │   ├── __init__.py
+│   │   ├── key_management/
+│   │   │   ├── __init__.py
+│   │   │   ├── key_validation.py
+│   │   │   ├── key_generation.py
+│   │   │   └── key_storage.py
+│   │   ├── hashing/
+│   │   │   ├── __init__.py
+│   │   │   └── sha256_hashing.py
+│   │   ├── encryption/
+│   │   │   ├── __init__.py
+│   │   │   └── aes256_gcm_encryption.py
+│   │   ├── fractal/
+│   │   │   ├── __init__.py
+│   │   │   ├── mandelbrot.py
+│   │   │   ├── julia.py
+│   │   │   └── fractal_parameters.py
+│   │   ├── ecc/
+│   │   │   ├── __init__.py
+│   │   │   └── reed_solomon_ecc.py
+│   │   ├── image_processing/
+│   │   │   ├── __init__.py
+│   │   │   ├── color_correction.py
+│   │   │   ├── noise_reduction.py
+│   │   │   └── image_optimization.py
+│   │   ├── error_handling/
+│   │   │   ├── __init__.py
+│   │   │   └── error_logger.py
+│   │   └── utils/
+│   │       ├── __init__.py
+│   │       ├── file_io.py
+│   │       ├── validation_utils.py
+│   │       └── security_utils.py
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── storage_service.py
+│   │   └── notification_service.py
+│   └── interfaces/
+│       ├── __init__.py
+│       ├── api.py
+│       └── cli.py
+├── tests/
+│   ├── __init__.py
+│   ├── unit/
+│   │   ├── __init__.py
+│   │   ├── test_key_validation.py
+│   │   ├── test_key_generation.py
+│   │   ├── test_sha256_hashing.py
+│   │   ├── test_aes256_gcm_encryption.py
+│   │   ├── test_mandelbrot.py
+│   │   ├── test_reed_solomon_ecc.py
+│   │   └── test_image_optimization.py
+│   ├── integration/
+│   │   ├── __init__.py
+│   │   ├── test_full_workflow.py
+│   │   └── test_ecc_integration.py
+│   └── mocks/
+│       ├── __init__.py
+│       ├── mock_key.py
+│       └── mock_image.py
+├── scripts/
+│   ├── deploy.sh
+│   ├── setup_env.sh
+│   └── backup.sh
+├── data/
+│   ├── logs/
+│   │   └── app.log
+│   ├── fractals/
+│   │   └── generated/
+│   └── keys/
+│       ├── private/
+│       └── public/
+├── config/
+│   └── default_config.yaml
+├── .dockerignore
+├── Dockerfile
+├── docker-compose.yml
+└── .github/
+    └── workflows/
+        └── ci.yml
