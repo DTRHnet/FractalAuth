@@ -15,10 +15,18 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Set up Python 3.10
+    - name: Set up Python 3.12
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: '3.12'  
+
+    - name: Cache pip
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}  # Updated to include both requirements.txt and requirements-dev.txt
+        restore-keys: |
+          ${{ runner.os }}-pip-
 
     - name: Install Dependencies
       run: |
@@ -38,19 +46,12 @@ jobs:
         source venv/bin/activate
         pytest tests/integration
 
-    - name: Cache pip
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-
-    - name: Run tests with coverage
+    - name: Run Tests with Coverage
       run: |
+        source venv/bin/activate
         pytest --cov=key_management --cov-report=xml tests/
 
-    - name: Upload coverage to Codecov
+    - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
         files: ./coverage.xml
